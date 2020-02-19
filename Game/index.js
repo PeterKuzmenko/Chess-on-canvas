@@ -8,7 +8,11 @@ let canvas = document.getElementById('game'),
 	x = 0,
 	y = 0,
 	num = 2,
-	colorOfAttackPlayer = "white";
+	colorOfAttackPlayer = "white",
+	whiteKing = {},
+	blackKing = {},
+	step = false,
+	cloneArr = [];
 
 let arr = [["", "", "", "", "", "", "", ""],
 			["", "", "", "", "", "", "", ""],
@@ -69,6 +73,14 @@ function addFigure(x, y, type, figureColor, figure) {
 		figureColor: figureColor,
 		figure: figure,
 		attempts: possibleAttempts(x, y, type, figureColor)
+	};
+	if(figure == "♔") {
+		whiteKing.x = x;
+		whiteKing.y = y;
+	}
+	if(figure == "♚") {
+		blackKing.x = x;
+		blackKing.y = y;
 	}
 }
 
@@ -302,7 +314,7 @@ canvas.addEventListener('click', (e) => {
 		x = (e.x - e.x % widthOfCell) / widthOfCell;
 		y = (e.y - e.y % widthOfCell) / widthOfCell;
 	}
-	if(figure.attempts == 0) {
+	if(!figure.attempts) {
 		figure = 0;
 	}
 	if(figure.figureColor != colorOfAttackPlayer) {
@@ -320,21 +332,51 @@ canvas.addEventListener('click', (e) => {
 			drawArray();
 			drawFigures();
 		} else {
-			if(colorOfAttackPlayer == "white") colorOfAttackPlayer = "black";
-			else colorOfAttackPlayer = "white";
-			for(let i = 0; i < figure.attempts.length; i++) {
-				if((e.y - e.y % widthOfCell) / widthOfCell == figure.attempts[i].y && (e.x - e.x % widthOfCell) / widthOfCell == figure.attempts[i].x) {
-					arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell] = figure;
-					arr[y][x] = "";
-					for(let i = 0; i < 8; i++) {
-						for (let k = 0; k < 8; k++) {
-							arr[i][k].attempts = possibleAttempts(k, i, arr[i][k].type, arr[i][k].figureColor);
-						}		
+			if(figure.attempts) {
+				if(colorOfAttackPlayer == "white") colorOfAttackPlayer = "black";
+				else colorOfAttackPlayer = "white";
+				for(let i = 0; i < figure.attempts.length; i++) {
+					if((e.y - e.y % widthOfCell) / widthOfCell == figure.attempts[i].y && (e.x - e.x % widthOfCell) / widthOfCell == figure.attempts[i].x) {
+						arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell] = figure;
+						arr[y][x] = "";
+						for(let l = 0; l < 8; l++) {
+							for (let k = 0; k < 8; k++) {
+								arr[l][k].attempts = possibleAttempts(k, l, arr[l][k].type, arr[l][k].figureColor);
+
+								if(arr[l][k]) {
+									for(let j = 0; j < arr[l][k].attempts.length; j++) {
+										if(arr[l][k].figureColor == "white" && arr[l][k].attempts[j].x == blackKing.x && arr[l][k].attempts[j].y == blackKing.y) {
+											for(let h = 0; h < arr[l][k].attempts.length; h++) {
+												for(let a = 0; a < arr[blackKing.y][blackKing.x].attempts.length; a++) {
+													if(arr[blackKing.y][blackKing.x].attempts[a].x == arr[l][k].attempts[h].x && arr[blackKing.y][blackKing.x].attempts[a].y == arr[l][k].attempts[h].y) {
+														cloneArr = arr[blackKing.y][blackKing.x].attempts.splice(a, 1);
+													}
+												}
+												for(let q = 0; q < 8; q++) {
+													for (let s = 0; s < 8; s++) {
+														if(arr[q][s]) {
+															for(let a = 0; a < arr[q][s].attempts.length; a++) {
+																if(arr[q][s].figureColor == "black" && arr[q][s].attempts[a].x == arr[l][k].attempts[h].x && arr[q][s].attempts[a].y == arr[l][k].attempts[h].y) ;
+																else {
+																	cloneArr = arr[q][s].attempts.slice(a, 1);
+																	console.log(arr[q][s].attempts);
+																}
+																
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+						figure = 0;
+						flag = true;
+						drawArray();
+						drawFigures();
 					}
-					figure = 0;
-					flag = true;
-					drawArray();
-					drawFigures();
 				}
 			}
 		}
