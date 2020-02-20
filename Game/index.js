@@ -33,7 +33,7 @@ ctx.strokeStyle = "#000";
 startGame();
 
 function startGame() {
-	drawArray();
+	drawChessboard();
 
 	addFigures();
 	addFigures();
@@ -46,10 +46,10 @@ function addFigures() {
 		addFigure(i, 6, "pawn", "white", "♙");
 	}
 
-	addFigure(7, 7, "elephant", "white", "♖");
-	addFigure(0, 7, "elephant", "white", "♖");
-	addFigure(7, 0, "elephant", "black", "♜");
-	addFigure(0, 0, "elephant", "black", "♜");
+	addFigure(7, 7, "bishop", "white", "♖");
+	addFigure(0, 7, "bishop", "white", "♖");
+	addFigure(7, 0, "bishop", "black", "♜");
+	addFigure(0, 0, "bishop", "black", "♜");
 
 	addFigure(6, 7, "horse", "white", "♘");
 	addFigure(1, 7, "horse", "white", "♘");
@@ -84,7 +84,7 @@ function addFigure(x, y, type, figureColor, figure) {
 	}
 }
 
-function drawArray() {
+function drawChessboard() {
 	for(let i = 0; i < 8; i++) {
 		if(color == "#FFDEAD") color = "#8B4513";
 		else color = "#FFDEAD";
@@ -145,18 +145,18 @@ function possibleAttempts(x, y, type, figureColor) {
 					addToAttempts(x, y + i);
 				} else break;
 			}
-			if(y+1 >= 0 && x+1 < 8 && arr[y+1][x+1] != "") {
-				if(arr[y-1][x+1].figureColor != figureColor) addToAttempts(x+1, y+1);
+			if(y+1 < 8 && x+1 < 8 && arr[y+1][x+1] != "") {
+				if(arr[y+1][x+1].figureColor != figureColor) addToAttempts(x+1, y+1);
 			} 
-			if(y+1 >= 0 && x-1 >= 0 && arr[y+1][x-1] != "") {
-				if(arr[y-1][x-1].figureColor != figureColor) addToAttempts(x-1, y+1);
+			if(y+1 < 8 && x-1 >= 0 && arr[y+1][x-1] != "") {
+				if(arr[y+1][x-1].figureColor != figureColor) addToAttempts(x-1, y+1);
 			} 
 		}
 		num = 1;
 	}
 
-	if(type == "elephant") {
-		forElephant(x, y, type, figureColor);
+	if(type == "bishop") {
+		forBishop(x, y, type, figureColor);
 	} else if(type == "horse") {
 		if(y + 2 < 8 && x - 1 >= 0 && arr[y + 2][x - 1].figureColor != figureColor) {
 			addToAttempts(x - 1, y + 2);
@@ -185,7 +185,7 @@ function possibleAttempts(x, y, type, figureColor) {
 	} else if(type == "rook") {
 		forRook(x, y, type, figureColor);
 	} else if(type == "queen") {
-		forElephant(x, y, type, figureColor);
+		forBishop(x, y, type, figureColor);
 		forRook(x, y, type, figureColor);
 	} else if(type == "king") {
 		if(y + 1 < 8 && x - 1 >= 0 && arr[y + 1][x - 1].figureColor != figureColor) {
@@ -217,7 +217,7 @@ function possibleAttempts(x, y, type, figureColor) {
 	return attempts;
 }
 
-function forElephant(x, y, type, figureColor) {
+function forRook(x, y, type, figureColor) {
 		for(let i = x + 1; i < 8; i++) {
 			if(arr[y][i] == "") {
 				addToAttempts(i, y);
@@ -252,7 +252,7 @@ function forElephant(x, y, type, figureColor) {
 		}
 }
 
-function forRook(x, y, type, figureColor) {
+function forBishop(x, y, type, figureColor) {
 		for(let i = 1; i < 8; i++) {
 			if(x + i < 8 && y + i < 8) {
 				if(arr[y + i][x + i] == "") {
@@ -308,6 +308,14 @@ function drawPossibleAttempts(x, y) {
 	ctx.fillRect(x * widthOfCell, y * widthOfCell, widthOfCell, widthOfCell);
 }
 
+function check() {
+	for(let l = 0; l < 8; l++) {
+		for (let k = 0; k < 8; k++) {
+			arr[l][k].attempts = possibleAttempts(k, l, arr[l][k].type, arr[l][k].figureColor);
+		}
+	}
+}
+
 canvas.addEventListener('click', (e) => {
 	if(!figure) {
 		figure = arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell];
@@ -329,7 +337,7 @@ canvas.addEventListener('click', (e) => {
 		if(figure == arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell]) {
 			figure = 0;
 			flag = true;
-			drawArray();
+			drawChessboard();
 			drawFigures();
 		} else {
 			if(figure.attempts) {
@@ -339,6 +347,25 @@ canvas.addEventListener('click', (e) => {
 					if((e.y - e.y % widthOfCell) / widthOfCell == figure.attempts[i].y && (e.x - e.x % widthOfCell) / widthOfCell == figure.attempts[i].x) {
 						arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell] = figure;
 						arr[y][x] = "";
+						
+						for(let l = 0; l < 8; l++) {
+							for (let k = 0; k < 8; k++) {
+								arr[l][k].attempts = possibleAttempts(k, l, arr[l][k].type, arr[l][k].figureColor);
+							}
+						}
+
+						figure = 0;
+						flag = true;
+						drawChessboard();
+						drawFigures();
+					}
+				}
+			}
+		}
+	}
+});
+
+/* 
 						for(let l = 0; l < 8; l++) {
 							for (let k = 0; k < 8; k++) {
 								arr[l][k].attempts = possibleAttempts(k, l, arr[l][k].type, arr[l][k].figureColor);
@@ -372,13 +399,4 @@ canvas.addEventListener('click', (e) => {
 								}
 							}
 						}
-						figure = 0;
-						flag = true;
-						drawArray();
-						drawFigures();
-					}
-				}
-			}
-		}
-	}
-});
+*/
