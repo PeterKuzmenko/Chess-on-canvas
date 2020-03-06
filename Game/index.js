@@ -1,35 +1,38 @@
-let canvas 									= document.getElementById('game'),
-		undo 									= document.getElementById('undo'),
-		ctx 										= canvas.getContext('2d'),
-		widthOfCell 						= 40,
-		color 									= "#FFDEAD",
-		flag 										= true,
-		attempts 								= [],
-		figure 									= 0,
-		x											  = 0,
-		y 											= 0,
-		num 										= 2,
-		colorOfAttackPlayer 		= "white",
-		whiteKing 							= {},
-		blackKing 							= {},
-		changeX 								= 0,
-		changeY 								= 0,
-		changeFigure						= 0,
-		flagOnCheck 						= false,
-		previousFigure 					= 0,
-		colorsForCheck 					= ["white", "black"],
-		changeElement 					= 0,
-		whiteFiguresForPawn 		= ["♖", "♘", "♗", "♕"],
-		blackFiguresForPawn 		= ["♜", "♞", "♝", "♛"],
-		flagForPawn							= false,
-		arrFigures    					= 0,
-		figureColor							= 0,
-		type 										= 0,
-		flagOnPossibleAttempts  = true,
-		flagOnCastlingWhite     = true,
-		flagOnCastlingBlack     = true,
-		history 								= [],
-		countHistory            = 0;
+let		canvas = document.getElementById('game'),
+		undo = document.getElementById('undo'),
+		ctx = canvas.getContext('2d'),
+		widthOfCell = 40,
+		color = "#FFDEAD",
+		flag = true,
+		attempts = [],
+		figure = 0,
+		x = 0,
+		y = 0,
+		num = 2,
+		colorOfAttackPlayer = "white",
+		whiteKing = {},
+		blackKing = {},
+		changeX = 0,
+		changeY = 0,
+		changeFigure = 0,
+		flagOnCheck 		= false,
+		previousFigure = 0,
+		colorsForCheck = ["black", "white"],
+		changeElement = 0,
+		whiteFiguresForPawn = ["♖", "♘", "♗", "♕"],
+		blackFiguresForPawn = ["♜", "♞", "♝", "♛"],
+		flagForPawn = false,
+		arrFigures = 0,
+		figureColor = 0,
+		type = 0,
+		flagOnPossibleAttempts = true,
+		flagOnCastlingWhite = true,
+		flagOnCastlingBlack = true,
+		history = [],
+		countHistory = 0,
+		king = 0,
+		flagForCheck = false,
+		flagForCheckmate = false;
 
 let arr = [["", "", "", "", "", "", "", ""],
 					["", "", "", "", "", "", "", ""],
@@ -226,15 +229,15 @@ function possibleAttempts(x, y, type, figureColor) {
 			addToAttempts(x, y + 1);
 		}
 
-		if(figureColor == "white") {
+		if(figureColor == "white" && flagOnCastlingWhite) {
 			if(!arr[7][1] && !arr[7][2]) {
 				addToAttempts(1, 7);
 			} else if(!arr[7][4] && !arr[7][5] && !arr[7][6]) {
-				addToAttempts(6, 7);
+				addToAttempts(5, 7);
 			}
-		} else if(figureColor == "black") {
+		} else if(figureColor == "black" && flagOnCastlingBlack) {
 			if(!arr[0][1] && !arr[0][2] && !arr[0][3]) {
-				addToAttempts(1, 0);
+				addToAttempts(2, 0);
 			} else if(!arr[0][5] && !arr[0][6]) {
 				addToAttempts(6, 0);
 			}
@@ -335,18 +338,33 @@ function drawPossibleAttempts(x, y) {
 	ctx.fillRect(x * widthOfCell, y * widthOfCell, widthOfCell, widthOfCell);
 }
 
-function check(color) {
-	if(color == "black") {
-		changeElement = colorsForCheck[0];
-		colorsForCheck[0] = colorsForCheck[1];
-		colorsForCheck[1] = changeElement;
+function check(color, ...args) {
+	if(!args[0]) {
+		if(color == "white") {
+			changeElement = colorsForCheck[0];
+			colorsForCheck[0] = colorsForCheck[1];
+			colorsForCheck[1] = changeElement;
+		}
+
+		if(color == "white") {
+			king = blackKing;
+		} else {
+			king = whiteKing;
+		}
+	} else {
+		if(color == "black") {
+			changeElement = colorsForCheck[0];
+			colorsForCheck[0] = colorsForCheck[1];
+			colorsForCheck[1] = changeElement;
+		}
 	}
 
 	for(let l = 0; l < 8; l++) {
 		for (let k = 0; k < 8; k++) {
 			if(arr[l][k]) {
 				for(let j = 0; j < arr[l][k].attempts.length; j++) {
-					if(arr[l][k].figureColor == colorsForCheck[0] && arr[l][k].attempts[j].x == blackKing.x && arr[l][k].attempts[j].y == blackKing.y) {
+					if(arr[l][k].figureColor == colorsForCheck[0] && arr[l][k].attempts[j].x == king.x && arr[l][k].attempts[j].y == king.y) {
+						flagForCheck = true;
 						for(let q = 0; q < 8; q++) {
 							for (let s = 0; s < 8; s++) {
 								if(arr[q][s] && arr[q][s].figureColor == colorsForCheck[1]) {
@@ -355,8 +373,8 @@ function check(color) {
 										changeY = arr[q][s].attempts[h].y;
 
 										if(arr[q][s].type == "king") {
-											blackKing.x = changeX;
-											blackKing.y = changeY;
+											king.x = changeX;
+											king.y = changeY;
 										}
 
 										changeFigure = arr[changeY][changeX];
@@ -368,7 +386,7 @@ function check(color) {
 												if(arr[d][n] && arr[d][n].figureColor == colorsForCheck[0]) {
 													arr[d][n].attempts = possibleAttempts(n, d, arr[d][n].type, arr[d][n].figureColor);
 													for(let p = 0; p < arr[d][n].attempts.length; p++) {
-														if(arr[d][n].attempts[p].x == blackKing.x && arr[d][n].attempts[p].y == blackKing.y) {
+														if(arr[d][n].attempts[p].x == king.x && arr[d][n].attempts[p].y == king.y) {
 															flagOnCheck = true;
 														}
 													}
@@ -380,8 +398,8 @@ function check(color) {
 										arr[changeY][changeX] = changeFigure;
 
 										if(arr[q][s].type == "king") {
-											blackKing.x = s;
-											blackKing.y = q;
+											king.x = s;
+											king.y = q;
 										}
 
 										if(flagOnCheck) {
@@ -403,7 +421,32 @@ function check(color) {
 			}
 		}
 	}
-	colorsForCheck = ["white", "black"];
+	colorsForCheck = ["black", "white"];
+	checkmate(colorOfAttackPlayer, args[0]);
+}
+
+function checkmate(color, ...args) {
+	if(!args[0]) {
+		if(color == "black") {
+			color = "white";
+		} else {
+			color =  "black";
+		}
+	}
+
+	console.log(color, flagForCheck);
+
+	for(let d = 0; d < 8; d++) {
+		for (let n = 0; n < 8; n++) {
+			if(flagForCheck && arr[d][n] && arr[d][n].figureColor == color && !arr[d][n].attempts.length) {
+				flagForCheckmate = true;
+			} else if(flagForCheck && arr[d][n] && arr[d][n].figureColor == color) {
+				flagForCheckmate = false;
+				flagForCheck = false;
+			}
+		}
+	}
+	console.log(flagForCheckmate);
 }
 
 function choiceForPawn(color) {
@@ -442,7 +485,9 @@ function choiceForPawn(color) {
 }
 
 canvas.addEventListener('click', (e) => {
-	if(flagForPawn) {
+	if(flagForCheckmate) {
+		
+	} else if(flagForPawn) {
 		let figure = 0;
 		if((e.y - e.y % widthOfCell) / widthOfCell == 4 && (e.x - e.x % widthOfCell) / widthOfCell == 3) {
 			figure = arrFigures[2];
@@ -465,6 +510,12 @@ canvas.addEventListener('click', (e) => {
 		flagForPawn = false;
 		drawArray();
 		drawFigures();
+		check(colorOfAttackPlayer, true);
+		if(flagForCheckmate) {
+			ctx.fillStyle = "black";
+			ctx.font = "bold 60px serif";
+			ctx.fillText("Game over", 13, 4*widthOfCell+10);
+		}
 	} else {
 		if(arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell] && arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell].figureColor == colorOfAttackPlayer) {
 			figure = arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell];
@@ -504,11 +555,10 @@ canvas.addEventListener('click', (e) => {
 							}
 						}
 
-						if(figure) {
+						if(figure.figure == "♔") {
 							whiteKing.x = (e.x - e.x % widthOfCell) / widthOfCell;
 							whiteKing.y = (e.y - e.y % widthOfCell) / widthOfCell;
-						}
-						if(figure) {
+						} else if(figure.figure == "♚") {
 							blackKing.x = (e.x - e.x % widthOfCell) / widthOfCell;
 							blackKing.y = (e.y - e.y % widthOfCell) / widthOfCell;
 						}
@@ -517,25 +567,24 @@ canvas.addEventListener('click', (e) => {
 							if((e.y - e.y % widthOfCell) / widthOfCell == 7 && (e.x - e.x % widthOfCell) / widthOfCell == 1) {
 								addFigure(2, 7, "elephant", "white", "♖");
 								arr[7][0] = "";
-							} else if((e.y - e.y % widthOfCell) / widthOfCell == 7 && (e.x - e.x % widthOfCell) / widthOfCell == 6) {
-								addFigure(5, 7, "elephant", "white", "♖");
+							} else if((e.y - e.y % widthOfCell) / widthOfCell == 7 && (e.x - e.x % widthOfCell) / widthOfCell == 5) {
+								addFigure(4, 7, "elephant", "white", "♖");
 								arr[7][7] = "";
 							}
+							
 						} else if(figure.figure == "♚" && flagOnCastlingBlack) {
-							if((e.y - e.y % widthOfCell) / widthOfCell == 0 && (e.x - e.x % widthOfCell) / widthOfCell == 1) {
+							if((e.y - e.y % widthOfCell) / widthOfCell == 0 && (e.x - e.x % widthOfCell) / widthOfCell == 2) {
 								addFigure(2, 0, "elephant", "black", "♜");
 								arr[0][0] = "";
 							} else if((e.y - e.y % widthOfCell) / widthOfCell == 0 && (e.x - e.x % widthOfCell) / widthOfCell == 6) {
-								addFigure(5, 0, "elephant", "black", "♜");
+								addFigure(6, 0, "elephant", "black", "♜");
 								arr[0][7] = "";
 							}
 						}
 
 						if(figure.figure == "♔" || figure.figure == "♖") {
 							flagOnCastlingWhite = false;
-						}
-
-						if(figure.figure == "♚" || figure.figure == "♜") {
+						} else if(figure.figure == "♚" || figure.figure == "♜") {
 							flagOnCastlingBlack = false;
 						}
 
@@ -557,6 +606,11 @@ canvas.addEventListener('click', (e) => {
 						drawFigures();
 						choiceForPawn(colorOfAttackPlayer);
 						flagOnPossibleAttempts = true;
+						if(flagForCheckmate) {
+							ctx.fillStyle = "black";
+							ctx.font = "bold 60px serif";
+							ctx.fillText("Game over", 13, 4*widthOfCell+10);
+						}
 						break;
 					} else {
 						flagOnPossibleAttempts = false;
