@@ -571,13 +571,12 @@ canvas.addEventListener('click', (e) => {
 								addFigure(4, 7, "elephant", "white", "♖");
 								arr[7][7] = "";
 							}
-							
 						} else if(figure.figure == "♚" && flagOnCastlingBlack) {
 							if((e.y - e.y % widthOfCell) / widthOfCell == 0 && (e.x - e.x % widthOfCell) / widthOfCell == 2) {
-								addFigure(2, 0, "elephant", "black", "♜");
+								addFigure(3, 0, "elephant", "black", "♜");
 								arr[0][0] = "";
 							} else if((e.y - e.y % widthOfCell) / widthOfCell == 0 && (e.x - e.x % widthOfCell) / widthOfCell == 6) {
-								addFigure(6, 0, "elephant", "black", "♜");
+								addFigure(5, 0, "elephant", "black", "♜");
 								arr[0][7] = "";
 							}
 						}
