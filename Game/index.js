@@ -29,7 +29,6 @@ let		canvas = document.getElementById('game'),
 		flagOnCastlingWhite = true,
 		flagOnCastlingBlack = true,
 		history = [],
-		countHistory = 0,
 		king = 0,
 		flagForCheck = false,
 		flagForCheckmate = false;
@@ -46,7 +45,6 @@ let arr = [["", "", "", "", "", "", "", ""],
 ctx.width = window.innerWidth;
 ctx.height = window.innerHeight;
 ctx.strokeStyle = "#000";
-
 startGame();
 
 function startGame() {
@@ -434,8 +432,6 @@ function checkmate(color, ...args) {
 		}
 	}
 
-	console.log(color, flagForCheck);
-
 	for(let d = 0; d < 8; d++) {
 		for (let n = 0; n < 8; n++) {
 			if(flagForCheck && arr[d][n] && arr[d][n].figureColor == color && !arr[d][n].attempts.length) {
@@ -446,7 +442,6 @@ function checkmate(color, ...args) {
 			}
 		}
 	}
-	console.log(flagForCheckmate);
 }
 
 function choiceForPawn(color) {
@@ -511,6 +506,7 @@ canvas.addEventListener('click', (e) => {
 		drawArray();
 		drawFigures();
 		check(colorOfAttackPlayer, true);
+		history.push(JSON.parse(JSON.stringify(arr)));
 		if(flagForCheckmate) {
 			ctx.fillStyle = "black";
 			ctx.font = "bold 60px serif";
@@ -545,8 +541,7 @@ canvas.addEventListener('click', (e) => {
 			if(figure.attempts) {
 				for(let i = 0; i < figure.attempts.length; i++) {
 					if((e.y - e.y % widthOfCell) / widthOfCell == figure.attempts[i].y && (e.x - e.x % widthOfCell) / widthOfCell == figure.attempts[i].x) {
-						history[countHistory] = arr;
-						countHistory++;
+						history.push(JSON.parse(JSON.stringify(arr)));
 						if(figure.type == "pawn") {
 							if((e.y - e.y % widthOfCell) / widthOfCell == 0 || (e.y - e.y % widthOfCell) / widthOfCell == 7) {
 								flagForPawn = true;
@@ -624,11 +619,11 @@ canvas.addEventListener('click', (e) => {
 	}
 });
 
-/*undo.addEventListener("click", () => {
-	arr = history[countHistory - 1];
-	console.log(arr);
+undo.addEventListener("click", () => {
+	arr = history[history.length - 1];
+	history.pop(history.length - 1);
 	if(colorOfAttackPlayer == "white") colorOfAttackPlayer = "black";
 	else colorOfAttackPlayer = "white";
 	drawArray();
 	drawFigures();
-})*/
+});
