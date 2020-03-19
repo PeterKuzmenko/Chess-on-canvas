@@ -28,8 +28,8 @@ let canvas = document.getElementById('game'),
     flagOnCastlingWhite = true,
     flagOnCastlingBlack = true,
     history = [],
-    countHistory = 0;
-king = 0,
+    countHistory = 1,
+	king = 0,
     flagForCheck = false,
     flagForCheckmate = false;
 
@@ -79,7 +79,7 @@ function startGame() {
     addFigures();
     drawFigures();
     history.push(JSON.parse(JSON.stringify(arr)));
-};
+}
 
 function addFigures() {
     for (var i = 0; i < 8; i++) {
@@ -124,7 +124,7 @@ function addFigure(x, y, type, figureColor, figure) {
     }
 }
 
-function drawArray() {
+function drawArray(newState = false) {
     for (let i = 0; i < 8; i++) {
         if (color == "#8B4513") color = "#e6bb7c";
         else color = "#8B4513";
@@ -136,6 +136,10 @@ function drawArray() {
             ctx.fillRect(i * widthOfCell + 30, y * widthOfCell + 30, widthOfCell, widthOfCell);
         }
     }
+
+    if (newState) {
+		history.length = countHistory;
+	}
 }
 
 function drawFigures() {
@@ -505,7 +509,7 @@ function choiceForPawn(color) {
     }
 }
 
-canvas.addEventListener('click', (e) => {
+canvas.addEventListener('click', e => {
     let ex = e.layerX - 30;
     let ey = e.layerY - 30;
     if (flagForCheckmate) {
@@ -620,12 +624,12 @@ canvas.addEventListener('click', (e) => {
                         check(colorOfAttackPlayer);
                         figure = 0;
                         flag = true;
-                        drawArray();
+                        drawArray(true);
                         drawFigures();
                         choiceForPawn(colorOfAttackPlayer);
+						countHistory++;
+						history.push(JSON.parse(JSON.stringify(arr)));
                         flagOnPossibleAttempts = true;
-                        history.push(JSON.parse(JSON.stringify(arr)));
-                        countHistory = history.length;
                         if (flagForCheckmate) {
                             ctx.fillStyle = "black";
                             ctx.font = "bold 60px serif";
@@ -647,19 +651,18 @@ canvas.addEventListener('click', (e) => {
 
 function undo() {
     if (history[countHistory - 2]) {
-        console.log(history, countHistory);
-        arr = history[countHistory - 2];
-        countHistory--;
+		countHistory--;
+        arr = JSON.parse(JSON.stringify(history[countHistory - 1]));
         if (colorOfAttackPlayer == "white") colorOfAttackPlayer = "black";
         else colorOfAttackPlayer = "white";
         drawArray();
         drawFigures();
     }
-};
+}
 
 function forward() {
-    if (countHistory + 1) {
-        arr = history[countHistory + 1];
+    if (history[countHistory]) {
+        arr = JSON.parse(JSON.stringify(history[countHistory]));
         countHistory++;
         if (colorOfAttackPlayer == "white") colorOfAttackPlayer = "black";
         else colorOfAttackPlayer = "white";
