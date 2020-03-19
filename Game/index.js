@@ -1,5 +1,4 @@
 let		canvas = document.getElementById('game'),
-		undo = document.getElementById('undo'),
 		ctx = canvas.getContext('2d'),
 		widthOfCell = 40,
 		color = "#FFDEAD",
@@ -29,6 +28,7 @@ let		canvas = document.getElementById('game'),
 		flagOnCastlingWhite = true,
 		flagOnCastlingBlack = true,
 		history = [],
+		countHistory = 0;
 		king = 0,
 		flagForCheck = false,
 		flagForCheckmate = false;
@@ -47,12 +47,38 @@ ctx.height = window.innerHeight;
 ctx.strokeStyle = "#000";
 startGame();
 
+
 function startGame() {
+	ctx.fillStyle = "#8B4513";
+	ctx.fillRect(0, 0, 380, 380);
+	ctx.fillStyle = "#e6bb7c";
+	ctx.fillRect(28, 28, 324, 324);
+	for(let i = 1; i <= 8; i++) {
+		ctx.fillStyle = "#e6bb7c";
+		ctx.font = "bold 30px serif";
+		ctx.fillText(i.toString(), 5, i*widthOfCell+20);
+	}
+	for(let i = 0; i < 8; i++) {
+		ctx.fillStyle = "#e6bb7c";
+		ctx.font = "bold 30px serif";
+		ctx.fillText(String.fromCharCode(65 + i), i*widthOfCell+widthOfCell, widthOfCell*9+17);
+	}
+	for(let i = 8; i >= 1; i--) {
+		ctx.fillStyle = "#e6bb7c";
+		ctx.font = "bold 30px serif";
+		ctx.fillText(String.fromCharCode(73 - i), i*widthOfCell, 25);
+	}
+	for(let i = 8; i >= 1; i--) {
+		ctx.fillStyle = "#e6bb7c";
+		ctx.font = "bold 30px serif";
+		ctx.fillText(i.toString(), widthOfCell*9, widthOfCell*9 - i*widthOfCell+20);
+	}
 	drawArray();
 
 	addFigures();
 	addFigures();
 	drawFigures();
+	history.push(JSON.parse(JSON.stringify(arr)));
 };
 
 function addFigures() {
@@ -100,14 +126,14 @@ function addFigure(x, y, type, figureColor, figure) {
 
 function drawArray() {
 	for(let i = 0; i < 8; i++) {
-		if(color == "#FFDEAD") color = "#8B4513";
-		else color = "#FFDEAD";
+		if(color == "#e6bb7c") color = "#8B4513";
+		else color = "#e6bb7c";
 		for(let y = 0; y < 8; y++) {
-			if(color == "#FFDEAD") color = "#8B4513";
-			else color = "#FFDEAD";
+			if(color == "#e6bb7c") color = "#8B4513";
+			else color = "#e6bb7c";
 
 			ctx.fillStyle = color;
-			ctx.fillRect(i*widthOfCell, y*widthOfCell, widthOfCell, widthOfCell);
+			ctx.fillRect(i*widthOfCell + 30, y*widthOfCell + 30, widthOfCell, widthOfCell);
 		}
 	}
 }
@@ -118,7 +144,7 @@ function drawFigures() {
 			if(arr[i][k] != "") {
 				ctx.fillStyle = arr[i][k].figureColor;
 				ctx.font = "bold 40px serif";
-				ctx.fillText(arr[i][k].figure, k*widthOfCell - 1, (i+1)*widthOfCell-5);
+				ctx.fillText(arr[i][k].figure, k*widthOfCell + 29, (i+1)*widthOfCell + 25);
 			}
 		}		
 	}
@@ -333,7 +359,7 @@ function forRook(x, y, type, figureColor) {
 
 function drawPossibleAttempts(x, y) {
 	ctx.fillStyle = "rgba(124,252,0, 0.8)";
-	ctx.fillRect(x * widthOfCell, y * widthOfCell, widthOfCell, widthOfCell);
+	ctx.fillRect(x * widthOfCell + 30, y * widthOfCell + 30, widthOfCell, widthOfCell);
 }
 
 function check(color, ...args) {
@@ -455,48 +481,50 @@ function choiceForPawn(color) {
 
 	if(flagForPawn) {
 		ctx.fillStyle = "gray";
-		ctx.fillRect(2*widthOfCell, 2*widthOfCell, 4*widthOfCell, 4*widthOfCell);
+		ctx.fillRect(2*widthOfCell + 30, 2*widthOfCell + 30, 4*widthOfCell, 4*widthOfCell);
 
 		ctx.fillStyle = color;
 		ctx.font = "bold 20px serif";
-		ctx.fillText("Pick the figure", 3*widthOfCell-20, 3*widthOfCell);
+		ctx.fillText("Pick the figure", 3*widthOfCell-20 + 30, 3*widthOfCell + 30);
 
 		ctx.fillStyle = color;
 		ctx.font = "bold 40px serif";
-		ctx.fillText(arrFigures[0], 4*widthOfCell, 4*widthOfCell);
+		ctx.fillText(arrFigures[0], 4*widthOfCell + 30, 4*widthOfCell + 30);
 
 		ctx.fillStyle = color;
 		ctx.font = "bold 40px serif";
-		ctx.fillText(arrFigures[1], 3*widthOfCell, 4*widthOfCell);
+		ctx.fillText(arrFigures[1], 3*widthOfCell + 30, 4*widthOfCell + 30);
 
 		ctx.fillStyle = color;
 		ctx.font = "bold 40px serif";
-		ctx.fillText(arrFigures[2], 3*widthOfCell, 5*widthOfCell);
+		ctx.fillText(arrFigures[2], 3*widthOfCell + 30, 5*widthOfCell + 30);
 
 		ctx.fillStyle = color;
 		ctx.font = "bold 40px serif";
-		ctx.fillText(arrFigures[3], 4*widthOfCell, 5*widthOfCell);
+		ctx.fillText(arrFigures[3], 4*widthOfCell + 30, 5*widthOfCell + 30);
 	}
 }
 
 canvas.addEventListener('click', (e) => {
+	let ex = e.layerX - 30;
+	let ey = e.layerY - 30;
 	if(flagForCheckmate) {
 		
 	} else if(flagForPawn) {
 		let figure = 0;
-		if((e.y - e.y % widthOfCell) / widthOfCell == 4 && (e.x - e.x % widthOfCell) / widthOfCell == 3) {
+		if((ey - ey % widthOfCell) / widthOfCell == 4 && (ex - ex % widthOfCell) / widthOfCell == 3) {
 			figure = arrFigures[2];
 			type = "rook";
 		}
-		else if((e.y - e.y % widthOfCell) / widthOfCell == 3 && (e.x - e.x % widthOfCell) / widthOfCell == 3) {
+		else if((ey - ey % widthOfCell) / widthOfCell == 3 && (ex - ex % widthOfCell) / widthOfCell == 3) {
 			figure = arrFigures[1];
 			type = "horse";
 		}
-		else if((e.y - e.y % widthOfCell) / widthOfCell == 3 && (e.x - e.x % widthOfCell) / widthOfCell == 4) {
+		else if((ey - ey % widthOfCell) / widthOfCell == 3 && (ex - ex % widthOfCell) / widthOfCell == 4) {
 			figure = arrFigures[0];
 			type = "elephant";
 		}
-		else if((e.y - e.y % widthOfCell) / widthOfCell == 4 && (e.x - e.x % widthOfCell) / widthOfCell == 4) {
+		else if((ey - ey % widthOfCell) / widthOfCell == 4 && (ex - ex % widthOfCell) / widthOfCell == 4) {
 			figure = arrFigures[3];
 			type = "queen";
 		}
@@ -513,10 +541,10 @@ canvas.addEventListener('click', (e) => {
 			ctx.fillText("Game over", 13, 4*widthOfCell+10);
 		}
 	} else {
-		if(arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell] && arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell].figureColor == colorOfAttackPlayer) {
-			figure = arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell];
-			x = (e.x - e.x % widthOfCell) / widthOfCell;
-			y = (e.y - e.y % widthOfCell) / widthOfCell;
+		if(arr[(ey - ey % widthOfCell) / widthOfCell][(ex - ex % widthOfCell) / widthOfCell] && arr[(ey - ey % widthOfCell) / widthOfCell][(ex - ex % widthOfCell) / widthOfCell].figureColor == colorOfAttackPlayer) {
+			figure = arr[(ey - ey % widthOfCell) / widthOfCell][(ex - ex % widthOfCell) / widthOfCell];
+			x = (ex - ex % widthOfCell) / widthOfCell;
+			y = (ey - ey % widthOfCell) / widthOfCell;
 
 			flag = true;
 		} else {
@@ -540,37 +568,36 @@ canvas.addEventListener('click', (e) => {
 		} else {
 			if(figure.attempts) {
 				for(let i = 0; i < figure.attempts.length; i++) {
-					if((e.y - e.y % widthOfCell) / widthOfCell == figure.attempts[i].y && (e.x - e.x % widthOfCell) / widthOfCell == figure.attempts[i].x) {
-						history.push(JSON.parse(JSON.stringify(arr)));
+					if((ey - ey % widthOfCell) / widthOfCell == figure.attempts[i].y && (ex - ex % widthOfCell) / widthOfCell == figure.attempts[i].x) {
 						if(figure.type == "pawn") {
-							if((e.y - e.y % widthOfCell) / widthOfCell == 0 || (e.y - e.y % widthOfCell) / widthOfCell == 7) {
+							if((ey - ey % widthOfCell) / widthOfCell == 0 || (ey - ey % widthOfCell) / widthOfCell == 7) {
 								flagForPawn = true;
-								changeX = (e.x - e.x % widthOfCell) / widthOfCell;
-								changeY = (e.y - e.y % widthOfCell) / widthOfCell;
+								changeX = (ex - ex % widthOfCell) / widthOfCell;
+								changeY = (ey - ey % widthOfCell) / widthOfCell;
 							}
 						}
 
 						if(figure.figure == "♔") {
-							whiteKing.x = (e.x - e.x % widthOfCell) / widthOfCell;
-							whiteKing.y = (e.y - e.y % widthOfCell) / widthOfCell;
+							whiteKing.x = (ex - ex % widthOfCell) / widthOfCell;
+							whiteKing.y = (ey - ey % widthOfCell) / widthOfCell;
 						} else if(figure.figure == "♚") {
-							blackKing.x = (e.x - e.x % widthOfCell) / widthOfCell;
-							blackKing.y = (e.y - e.y % widthOfCell) / widthOfCell;
+							blackKing.x = (ex - ex % widthOfCell) / widthOfCell;
+							blackKing.y = (ey - ey % widthOfCell) / widthOfCell;
 						}
 
 						if(figure.figure == "♔" && flagOnCastlingWhite) {
-							if((e.y - e.y % widthOfCell) / widthOfCell == 7 && (e.x - e.x % widthOfCell) / widthOfCell == 1) {
+							if((ey - ey % widthOfCell) / widthOfCell == 7 && (ex - ex % widthOfCell) / widthOfCell == 1) {
 								addFigure(2, 7, "elephant", "white", "♖");
 								arr[7][0] = "";
-							} else if((e.y - e.y % widthOfCell) / widthOfCell == 7 && (e.x - e.x % widthOfCell) / widthOfCell == 5) {
+							} else if((ey - ey % widthOfCell) / widthOfCell == 7 && (ex - ex % widthOfCell) / widthOfCell == 5) {
 								addFigure(4, 7, "elephant", "white", "♖");
 								arr[7][7] = "";
 							}
 						} else if(figure.figure == "♚" && flagOnCastlingBlack) {
-							if((e.y - e.y % widthOfCell) / widthOfCell == 0 && (e.x - e.x % widthOfCell) / widthOfCell == 2) {
+							if((ey - ey % widthOfCell) / widthOfCell == 0 && (ex - ex % widthOfCell) / widthOfCell == 2) {
 								addFigure(3, 0, "elephant", "black", "♜");
 								arr[0][0] = "";
-							} else if((e.y - e.y % widthOfCell) / widthOfCell == 0 && (e.x - e.x % widthOfCell) / widthOfCell == 6) {
+							} else if((ey - ey % widthOfCell) / widthOfCell == 0 && (ex - ex % widthOfCell) / widthOfCell == 6) {
 								addFigure(5, 0, "elephant", "black", "♜");
 								arr[0][7] = "";
 							}
@@ -582,7 +609,7 @@ canvas.addEventListener('click', (e) => {
 							flagOnCastlingBlack = false;
 						}
 
-						arr[(e.y - e.y % widthOfCell) / widthOfCell][(e.x - e.x % widthOfCell) / widthOfCell] = figure;
+						arr[(ey - ey % widthOfCell) / widthOfCell][(ex - ex % widthOfCell) / widthOfCell] = figure;
 						arr[y][x] = "";
 						
 						for(let l = 0; l < 8; l++) {
@@ -600,6 +627,8 @@ canvas.addEventListener('click', (e) => {
 						drawFigures();
 						choiceForPawn(colorOfAttackPlayer);
 						flagOnPossibleAttempts = true;
+						history.push(JSON.parse(JSON.stringify(arr)));
+						countHistory = history.length;
 						if(flagForCheckmate) {
 							ctx.fillStyle = "black";
 							ctx.font = "bold 60px serif";
@@ -619,11 +648,40 @@ canvas.addEventListener('click', (e) => {
 	}
 });
 
-undo.addEventListener("click", () => {
-	arr = history[history.length - 1];
-	history.pop(history.length - 1);
-	if(colorOfAttackPlayer == "white") colorOfAttackPlayer = "black";
-	else colorOfAttackPlayer = "white";
-	drawArray();
-	drawFigures();
-});
+function undo() {
+	if(countHistory) {
+		console.log(countHistory);
+		arr = history[countHistory - 1];
+		countHistory--;
+		if(colorOfAttackPlayer == "white") colorOfAttackPlayer = "black";
+		else colorOfAttackPlayer = "white";
+		drawArray();
+		drawFigures();
+	}
+};
+
+function forward() {
+	if(countHistory + 1) {
+		arr = history[countHistory + 1];
+		countHistory++;
+		if(colorOfAttackPlayer == "white") colorOfAttackPlayer = "black";
+		else colorOfAttackPlayer = "white";
+		drawArray();
+		drawFigures();
+	}
+}
+
+function restart() {
+	if(confirm("are you sure?")) {
+		arr = [["", "", "", "", "", "", "", ""],
+					["", "", "", "", "", "", "", ""],
+					["", "", "", "", "", "", "", ""],
+					["", "", "", "", "", "", "", ""],
+					["", "", "", "", "", "", "", ""],
+					["", "", "", "", "", "", "", ""],
+					["", "", "", "", "", "", "", ""],
+					["", "", "", "", "", "", "", ""]]
+		startGame();
+		colorOfAttackPlayer = "white";
+	}
+}
