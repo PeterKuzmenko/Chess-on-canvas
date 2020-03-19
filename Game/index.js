@@ -53,17 +53,10 @@ function startGame() {
 	ctx.fillRect(0, 0, 380, 380);
 	ctx.fillStyle = "#e6bb7c";
 	ctx.fillRect(28, 28, 324, 324);
-<<<<<<< HEAD
 	for(let i = 8; i >= 1; i--) {
 		ctx.fillStyle = "#e6bb7c";
 		ctx.font = "bold 30px serif";
 		ctx.fillText(i.toString(), 5, widthOfCell*9 - i*widthOfCell+20);
-=======
-	for(let i = 1; i <= 8; i++) {
-		ctx.fillStyle = "#e6bb7c";
-		ctx.font = "bold 30px serif";
-		ctx.fillText(i.toString(), 5, i*widthOfCell+20);
->>>>>>> d44bbcbbf2edd0a8fd8bbaa631384e90e1014c98
 	}
 	for(let i = 0; i < 8; i++) {
 		ctx.fillStyle = "#e6bb7c";
@@ -73,21 +66,12 @@ function startGame() {
 	for(let i = 8; i >= 1; i--) {
 		ctx.fillStyle = "#e6bb7c";
 		ctx.font = "bold 30px serif";
-<<<<<<< HEAD
 		ctx.fillText(i.toString(), widthOfCell*9, widthOfCell*9 - i*widthOfCell+20);
 	}
 	for(let i = 0; i < 8; i++) {
 		ctx.fillStyle = "#e6bb7c";
 		ctx.font = "bold 30px serif";
 		ctx.fillText(String.fromCharCode(65 + i), i*widthOfCell+widthOfCell, 25);
-=======
-		ctx.fillText(String.fromCharCode(73 - i), i*widthOfCell, 25);
-	}
-	for(let i = 8; i >= 1; i--) {
-		ctx.fillStyle = "#e6bb7c";
-		ctx.font = "bold 30px serif";
-		ctx.fillText(i.toString(), widthOfCell*9, widthOfCell*9 - i*widthOfCell+20);
->>>>>>> d44bbcbbf2edd0a8fd8bbaa631384e90e1014c98
 	}
 	drawArray();
 
@@ -142,19 +126,11 @@ function addFigure(x, y, type, figureColor, figure) {
 
 function drawArray() {
 	for(let i = 0; i < 8; i++) {
-<<<<<<< HEAD
 		if(color == "#8B4513") color = "#e6bb7c";
 		else color = "#8B4513";
 		for(let y = 0; y < 8; y++) {
 			if(color == "#8B4513") color = "#e6bb7c";
 			else color = "#8B4513";
-=======
-		if(color == "#e6bb7c") color = "#8B4513";
-		else color = "#e6bb7c";
-		for(let y = 0; y < 8; y++) {
-			if(color == "#e6bb7c") color = "#8B4513";
-			else color = "#e6bb7c";
->>>>>>> d44bbcbbf2edd0a8fd8bbaa631384e90e1014c98
 
 			ctx.fillStyle = color;
 			ctx.fillRect(i*widthOfCell + 30, y*widthOfCell + 30, widthOfCell, widthOfCell);
@@ -673,15 +649,9 @@ canvas.addEventListener('click', (e) => {
 });
 
 function undo() {
-<<<<<<< HEAD
 	if(history[countHistory - 2]) {
 		console.log(history, countHistory);
 		arr = history[countHistory - 2];
-=======
-	if(countHistory) {
-		console.log(countHistory);
-		arr = history[countHistory - 1];
->>>>>>> d44bbcbbf2edd0a8fd8bbaa631384e90e1014c98
 		countHistory--;
 		if(colorOfAttackPlayer == "white") colorOfAttackPlayer = "black";
 		else colorOfAttackPlayer = "white";
@@ -714,8 +684,4 @@ function restart() {
 		startGame();
 		colorOfAttackPlayer = "white";
 	}
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> d44bbcbbf2edd0a8fd8bbaa631384e90e1014c98
