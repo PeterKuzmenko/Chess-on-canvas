@@ -53,10 +53,10 @@ function startGame() {
 	ctx.fillRect(0, 0, 380, 380);
 	ctx.fillStyle = "#e6bb7c";
 	ctx.fillRect(28, 28, 324, 324);
-	for(let i = 1; i <= 8; i++) {
+	for(let i = 8; i >= 1; i--) {
 		ctx.fillStyle = "#e6bb7c";
 		ctx.font = "bold 30px serif";
-		ctx.fillText(i.toString(), 5, i*widthOfCell+20);
+		ctx.fillText(i.toString(), 5, widthOfCell*9 - i*widthOfCell+20);
 	}
 	for(let i = 0; i < 8; i++) {
 		ctx.fillStyle = "#e6bb7c";
@@ -66,12 +66,12 @@ function startGame() {
 	for(let i = 8; i >= 1; i--) {
 		ctx.fillStyle = "#e6bb7c";
 		ctx.font = "bold 30px serif";
-		ctx.fillText(String.fromCharCode(73 - i), i*widthOfCell, 25);
+		ctx.fillText(i.toString(), widthOfCell*9, widthOfCell*9 - i*widthOfCell+20);
 	}
-	for(let i = 8; i >= 1; i--) {
+	for(let i = 0; i < 8; i++) {
 		ctx.fillStyle = "#e6bb7c";
 		ctx.font = "bold 30px serif";
-		ctx.fillText(i.toString(), widthOfCell*9, widthOfCell*9 - i*widthOfCell+20);
+		ctx.fillText(String.fromCharCode(65 + i), i*widthOfCell+widthOfCell, 25);
 	}
 	drawArray();
 
@@ -102,8 +102,8 @@ function addFigures() {
 	addFigure(5, 0, "rook", "black", "♝");
 	addFigure(2, 0, "rook", "black", "♝");
 
-	addFigure(4, 7, "queen", "white", "♕");
-	addFigure(3, 7, "king", "white", "♔");
+	addFigure(3, 7, "queen", "white", "♕");
+	addFigure(4, 7, "king", "white", "♔");
 	addFigure(3, 0, "queen", "black", "♛");
 	addFigure(4, 0, "king", "black", "♚");
 }
@@ -126,11 +126,11 @@ function addFigure(x, y, type, figureColor, figure) {
 
 function drawArray() {
 	for(let i = 0; i < 8; i++) {
-		if(color == "#e6bb7c") color = "#8B4513";
-		else color = "#e6bb7c";
+		if(color == "#8B4513") color = "#e6bb7c";
+		else color = "#8B4513";
 		for(let y = 0; y < 8; y++) {
-			if(color == "#e6bb7c") color = "#8B4513";
-			else color = "#e6bb7c";
+			if(color == "#8B4513") color = "#e6bb7c";
+			else color = "#8B4513";
 
 			ctx.fillStyle = color;
 			ctx.fillRect(i*widthOfCell + 30, y*widthOfCell + 30, widthOfCell, widthOfCell);
@@ -649,9 +649,9 @@ canvas.addEventListener('click', (e) => {
 });
 
 function undo() {
-	if(countHistory) {
-		console.log(countHistory);
-		arr = history[countHistory - 1];
+	if(history[countHistory - 2]) {
+		console.log(history, countHistory);
+		arr = history[countHistory - 2];
 		countHistory--;
 		if(colorOfAttackPlayer == "white") colorOfAttackPlayer = "black";
 		else colorOfAttackPlayer = "white";
