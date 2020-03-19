@@ -1,4 +1,30 @@
 body {
 	margin: 0;
 	padding: 0;
+	height: 100vh;
+	display: flex;
+  justify-content: center;
+  align-items: center;
+	background: url("https://www.meme-arsenal.com/memes/53c1aaa47dfef627ea55dbf0e4f5edcb.jpg") no-repeat;
+	background-size: cover;
+}
+
+.buttons{
+	margin-left: 35px;
+	display: flex;
+	flex-direction: column; 
+	justify-content: center;
+}
+
+input {
+	width: 50px;
+	height: 45px;
+	font-size: 40px;
+	font-weight: bold;
+	padding-top: 5px;
+	margin: 15px 0;
+}
+
+#restart {
+	padding: 0px;
 }
