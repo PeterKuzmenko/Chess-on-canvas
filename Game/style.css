@@ -3,12 +3,10 @@ body {
 	padding: 0;
 	height: 100vh;
 	display: flex;
-  justify-content: center;
-  align-items: center;
+    justify-content: center;
+    align-items: center;
 	background: url("https://www.meme-arsenal.com/memes/53c1aaa47dfef627ea55dbf0e4f5edcb.jpg") no-repeat;
 	background-size: cover;
-<<<<<<< HEAD
-=======
 }
 
 .buttons{
@@ -29,7 +27,6 @@ input {
 
 #restart {
 	padding: 0px;
->>>>>>> d44bbcbbf2edd0a8fd8bbaa631384e90e1014c98
 }
 
 .buttons{
